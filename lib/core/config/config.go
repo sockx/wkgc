@@ -41,6 +41,8 @@ type Mysql struct{
 import (
 	"io/ioutil"
 	"log"
+	"strings"
+	"wkgc/lib/utils/iot"
 
 	"gopkg.in/yaml.v3"
 )
@@ -64,7 +66,17 @@ func Load() error {
 		log.Fatalln("Unmarshal:", err)
 		return err
 	}
-
 	Config = conf
+	// 修正结尾
+	if !strings.HasSuffix(Config.WorkDir, "\\") && !strings.HasSuffix(Config.WorkDir, "/") {
+		Config.WorkDir += "/"
+	}
+	// 拼接数据目录的绝对路径
+	if strings.HasPrefix(Config.WorkDir, ".") {
+		iotool := iot.NewIoTool()
+		Config.WorkDir = iotool.NoWorkDir + string([]byte(Config.WorkDir)[1:len(Config.WorkDir)])
+	}
+	// 美化路径
+	Config.WorkDir = strings.ReplaceAll(Config.WorkDir, "\\", "/")
 	return err
 }
