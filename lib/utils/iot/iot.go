@@ -1,6 +1,7 @@
 package iot
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 )
@@ -49,4 +50,35 @@ func (i *IoToolModel) createDir(dirName string) bool {
 		return false
 	}
 	return true
+}
+
+/*
+Get the full path of all files in the current folder.
+*/
+func scanDir(dir string) []string {
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		log.Printf("read [%s] error, err = %s\n", dir, err)
+	}
+	var fileList []string
+	for _, file := range files {
+		fileList = append(fileList, dir+string(os.PathSeparator)+file.Name())
+	}
+	return fileList
+}
+
+/**
+Determine whether the current directory contains a .git folder to determine whether the current file is a git project.
+*/
+func isGit(dir string) bool {
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		log.Printf("read [%s] error, err = %s\n", dir, err)
+	}
+	for _, file := range files {
+		if file.IsDir() && file.Name() == ".git" {
+			return true
+		}
+	}
+	return false
 }
