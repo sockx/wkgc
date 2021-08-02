@@ -16,3 +16,6 @@
 
 # config
 config.yml
+
+# database
+*.db
