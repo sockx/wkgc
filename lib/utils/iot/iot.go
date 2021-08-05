@@ -45,11 +45,7 @@ func (i *IoToolModel) IsDir(fileAddr string) bool {
 */
 func (i *IoToolModel) createDir(dirName string) bool {
 	err := os.Mkdir(dirName, 755)
-	if err != nil {
-		// log.Println(err)
-		return false
-	}
-	return true
+	return err == nil
 }
 
 /*
