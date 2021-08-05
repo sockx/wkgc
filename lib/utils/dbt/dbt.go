@@ -15,6 +15,8 @@ type DirInfoClass struct {
 	Dirname  string `col:"dirname" json:"dirname"`
 	Describe string `col:"describe" json:"describe"`
 	Isgit    bool   `col:"isgit" json:"isgit"`
+	Lang     string `col:"lang" json:"lang"`
+	Tag      string `col:"tag" json:"tag"`
 	Created  string `col:"created" json:"created"`
 }
 
@@ -23,7 +25,7 @@ type DirInfoClass struct {
 */
 func (dic *DirInfoClass) ParseResult(rows *sql.Rows) {
 	for rows.Next() {
-		rows.Scan(&dic.Did, &dic.Dirname, &dic.Describe, &dic.Isgit, &dic.Created)
+		rows.Scan(&dic.Did, &dic.Dirname, &dic.Describe, &dic.Isgit, &dic.Lang, &dic.Tag, &dic.Created)
 	}
 }
 
@@ -35,11 +37,13 @@ func InitLocalDatabase() {
 	db := OpenLocalDatabase()
 	sql_table := `
 	CREATE TABLE IF NOT EXISTS "dirinfo" (
-		"did" INTEGER PRIMARY KEY AUTOINCREMENT,
+		"did" INTEGER PRIMARY KEY AUTOINCREMENT, -- dir id
 		"dirname" VARCHAR(64) NULL,
 		"describe" VARCHAR(255) NULL,
-		"isgit" Bool NULL,
-		"created" TIMESTAMP default (datetime('now', 'localtime'))  
+		"isgit" Bool NULL, -- is git or not
+	    "lang" VARCHAR(255) NULL, -- Percentage of each language
+	    "tag" VARCHAR(255) NULL, -- project or dir tags
+		"created" TIMESTAMP default (datetime('now', 'localtime'))
 	);`
 	db.Exec(sql_table)
 	db.Close()
