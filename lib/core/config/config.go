@@ -42,6 +42,7 @@ import (
 	"io/ioutil"
 	"log"
 	"strings"
+	"wkgc/lib/utils/checkerr"
 	"wkgc/lib/utils/iot"
 
 	"gopkg.in/yaml.v3"
@@ -54,17 +55,17 @@ type ConfigBase struct {
 
 var Config *ConfigBase
 
-func Load() error {
+func Load() {
 	conf := new(ConfigBase)
 	yamlFile, err := ioutil.ReadFile("./config.yml")
 	if err != nil {
 		log.Println("tamlFile.Get err", err)
-		return err
+		checkerr.CheckErr(err)
 	}
 	err = yaml.Unmarshal(yamlFile, conf)
 	if err != nil {
 		log.Fatalln("Unmarshal:", err)
-		return err
+		checkerr.CheckErr(err)
 	}
 	Config = conf
 	// 修正结尾
@@ -78,5 +79,4 @@ func Load() error {
 	}
 	// 美化路径
 	Config.WorkDir = strings.ReplaceAll(Config.WorkDir, "\\", "/")
-	return err
 }

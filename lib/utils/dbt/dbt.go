@@ -3,6 +3,7 @@ package dbt
 import (
 	"database/sql"
 	"wkgc/lib/core/config"
+	"wkgc/lib/utils/checkerr"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -25,7 +26,8 @@ type DirInfoClass struct {
 */
 func (dic *DirInfoClass) ParseResult(rows *sql.Rows) {
 	for rows.Next() {
-		rows.Scan(&dic.Did, &dic.Dirname, &dic.Describe, &dic.Isgit, &dic.Lang, &dic.Tag, &dic.Created)
+		err := rows.Scan(&dic.Did, &dic.Dirname, &dic.Describe, &dic.Isgit, &dic.Lang, &dic.Tag, &dic.Created)
+		checkerr.CheckErr(err)
 	}
 }
 
@@ -45,7 +47,8 @@ func InitLocalDatabase() {
 	    "tag" VARCHAR(255) NULL, -- project or dir tags
 		"created" TIMESTAMP default (datetime('now', 'localtime'))
 	);`
-	db.Exec(sql_table)
+	_, err := db.Exec(sql_table)
+	checkerr.CheckErr(err)
 	db.Close()
 }
 
@@ -54,7 +57,7 @@ func InitLocalDatabase() {
 */
 func OpenLocalDatabase() *sql.DB {
 	db, err := sql.Open("sqlite3", config.Config.Database)
-	checkErr(err)
+	checkerr.CheckErr(err)
 	return db
 }
 
@@ -64,8 +67,9 @@ func OpenLocalDatabase() *sql.DB {
 func AddDirInfo(dirname string, describe string, isgit bool) {
 	db := OpenLocalDatabase()
 	stmt, err := db.Prepare("INSERT INTO dirinfo(dirname, describe, isgit) values(?,?,?)")
-	checkErr(err)
-	stmt.Exec(dirname, describe, isgit)
+	checkerr.CheckErr(err)
+	_, err = stmt.Exec(dirname, describe, isgit)
+	checkerr.CheckErr(err)
 	db.Close()
 }
 
@@ -75,9 +79,9 @@ func AddDirInfo(dirname string, describe string, isgit bool) {
 func SelectDirinfoByDid(did int) *DirInfoClass {
 	db := OpenLocalDatabase()
 	stmt, err := db.Prepare("SELECT * FROM dirinfo WHERE did=?")
-	checkErr(err)
+	checkerr.CheckErr(err)
 	thisrows, err := stmt.Query(did)
-	checkErr(err)
+	checkerr.CheckErr(err)
 	// 创建对象
 	dinfo := new(DirInfoClass)
 	// 解析对象
@@ -92,8 +96,9 @@ func SelectDirinfoByDid(did int) *DirInfoClass {
 func UpdateDirInfo(dirinfobj DirInfoClass) {
 	db := OpenLocalDatabase()
 	stmt, err := db.Prepare("update dirinfo set dirname=?,describe=?,isgit=?,created=?  where did=?")
-	checkErr(err)
-	stmt.Exec(dirinfobj.Dirname, dirinfobj.Describe, dirinfobj.Isgit, dirinfobj.Created, dirinfobj.Did)
+	checkerr.CheckErr(err)
+	_, err = stmt.Exec(dirinfobj.Dirname, dirinfobj.Describe, dirinfobj.Isgit, dirinfobj.Created, dirinfobj.Did)
+	checkerr.CheckErr(err)
 	db.Close()
 }
 
@@ -103,22 +108,14 @@ func UpdateDirInfo(dirinfobj DirInfoClass) {
 func DeleteDirInfoByDid(did int) bool {
 	db := OpenLocalDatabase()
 	stmt, err := db.Prepare("DELETE FROM dirinfo WHERE did=?")
-	checkErr(err)
+	checkerr.CheckErr(err)
 	res, err := stmt.Exec(did)
-	checkErr(err)
+	checkerr.CheckErr(err)
 	affect, err := res.RowsAffected()
+	checkerr.CheckErr(err)
 	ret := false
 	if affect > 0 {
 		ret = true
 	}
 	return ret
-}
-
-/*
-	Check Error
-*/
-func checkErr(err error) {
-	if err != nil {
-		panic(err)
-	}
 }
