@@ -44,21 +44,21 @@ func (i *IoToolModel) IsDir(fileAddr string) bool {
 创建文件夹
 */
 func (i *IoToolModel) createDir(dirName string) bool {
-	err := os.Mkdir(dirName, 755)
+	err := os.Mkdir(dirName, 0755)
 	return err == nil
 }
 
 /*
 Get the full path of all files in the current folder.
 */
-func scanDir(dir string) []string {
+func ScanDir(dir string) []string {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		log.Printf("read [%s] error, err = %s\n", dir, err)
 	}
 	var fileList []string
 	for _, file := range files {
-		fileList = append(fileList, dir+string(os.PathSeparator)+file.Name())
+		fileList = append(fileList, dir+file.Name())
 	}
 	return fileList
 }
@@ -66,7 +66,7 @@ func scanDir(dir string) []string {
 /**
 Determine whether the current directory contains a .git folder to determine whether the current file is a git project.
 */
-func isGit(dir string) bool {
+func IsGit(dir string) bool {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		log.Printf("read [%s] error, err = %s\n", dir, err)
