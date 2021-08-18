@@ -7,10 +7,10 @@ import (
 
 func TestScanDir(t *testing.T) {
 	var dir = "D:\\code\\wkgc"
-	fmt.Print(scanDir(dir))
+	fmt.Print(ScanDir(dir))
 }
 
 func TestIsGit(t *testing.T) {
 	var dir = "D:\\code\\wkgc"
-	fmt.Print(isGit(dir))
+	fmt.Print(IsGit(dir))
 }
