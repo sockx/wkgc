@@ -26,7 +26,9 @@ var db, _ = gorm.Open(sqlite.Open("data.db"), &gorm.Config{
 
 func InitLocalDatabase() {
 	// db := OpenLocalDatabases()
-	db.AutoMigrate(&DirInfo{})
+	if err := db.AutoMigrate(&DirInfo{}); err != nil {
+		panic(err)
+	}
 }
 
 func AddDirInfo(dirname string, dirpath string, describe string, isgit bool, lang string, tag string) {
