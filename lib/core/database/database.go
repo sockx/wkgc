@@ -35,14 +35,14 @@ func AddDirInfo(dirname string, dirpath string, describe string, isgit bool, lan
 	db.Create(&DirInfo{Dirname: dirname, Path: dirpath, Describe: describe, Isgit: isgit, Lang: lang, Tag: tag})
 }
 
-func (d *DirInfo) SelectDirinfoByDid(id int) bool {
+func (d *DirInfo) SelectDirInfoByDid(id int) bool {
 	if err := db.First(d, id).Error; err != nil {
 		return false
 	}
 	return true
 }
 
-func (d *DirInfo) SelectDirinfoByPath(path string) bool {
+func (d *DirInfo) SelectDirInfoByPath(path string) bool {
 	if err := db.First(d, "path = ?", path).Error; err != nil {
 		return false
 	}

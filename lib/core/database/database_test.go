@@ -16,12 +16,12 @@ func TestAdd(t *testing.T) {
 
 func TestSelect(t *testing.T) {
 	var d1 DirInfo
-	if d1.SelectDirinfoByDid(1) {
+	if d1.SelectDirInfoByDid(1) {
 		fmt.Print(d1.ID)
 	} else {
 		println("no")
 	}
-	if d1.SelectDirinfoByDid(2) {
+	if d1.SelectDirInfoByDid(2) {
 		fmt.Print(d1.ID)
 	} else {
 		println("no")
@@ -30,6 +30,6 @@ func TestSelect(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	var d1 DirInfo
-	d1.SelectDirinfoByDid(2)
+	d1.SelectDirInfoByDid(2)
 	d1.DeleteDirInfo()
 }
