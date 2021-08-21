@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
 )
 
 type IoToolModel struct {
@@ -28,9 +29,7 @@ func (i *IoToolModel) CheckAndCreateDir(fpath string) {
 	}
 }
 
-/*
-判断文件是否存在
-*/
+// IsDir /* this dir is existed.
 func (i *IoToolModel) IsDir(fileAddr string) bool {
 	s, err := os.Stat(fileAddr)
 	if err != nil {
@@ -48,9 +47,7 @@ func (i *IoToolModel) createDir(dirName string) bool {
 	return err == nil
 }
 
-/*
-Get the full path of all files in the current folder.
-*/
+// ScanDir /* Get the full path of all files in the current folder.
 func ScanDir(dir string) []string {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -63,9 +60,7 @@ func ScanDir(dir string) []string {
 	return fileList
 }
 
-/**
-Determine whether the current directory contains a .git folder to determine whether the current file is a git project.
-*/
+// IsGit /* Determine whether the current directory contains a .git folder to determine whether the current file is a git project.
 func IsGit(dir string) bool {
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
@@ -77,4 +72,25 @@ func IsGit(dir string) bool {
 		}
 	}
 	return false
+}
+
+// GetLanguage /** Get git project Suffix.
+func GetLanguage(dir string) map[string]uint64 {
+	var langMap = make(map[string]uint64)
+	files, err := ioutil.ReadDir(dir)
+	if err != nil {
+		log.Printf("read [%s] error, err = %s\n", dir, err)
+	}
+	for _, file := range files {
+		if file != nil && !file.IsDir() {
+			var ext = path.Ext(dir + file.Name())
+			var count, existed = langMap[ext]
+			if existed {
+				langMap[ext] = count + 1
+			} else {
+				langMap[ext] = 1
+			}
+		}
+	}
+	return langMap
 }

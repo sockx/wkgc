@@ -21,7 +21,7 @@ func main() {
 		// println(dirs[i], iot.IsGit(dirs[i]))
 		shortname := strings.ReplaceAll(dirs[i], config.Config.WorkDir, "")
 		var d database.DirInfo
-		if !d.SelectDirinfoByPath(shortname) {
+		if !d.SelectDirInfoByPath(shortname) {
 			database.AddDirInfo(shortname, shortname, shortname, iot.IsGit(dirs[i]), "", "")
 		}
 	}
