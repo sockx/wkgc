@@ -79,4 +79,6 @@ func Load() {
 	}
 	// 美化路径
 	Config.WorkDir = strings.ReplaceAll(Config.WorkDir, "\\", "/")
+	// 数据库补充完整路径
+	Config.Database = iot.GetCurrentDirectory() + Config.Database
 }

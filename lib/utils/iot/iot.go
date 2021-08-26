@@ -5,6 +5,9 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
+	"strings"
+	"wkgc/lib/utils/checkerr"
 )
 
 type IoToolModel struct {
@@ -45,6 +48,15 @@ func (i *IoToolModel) IsDir(fileAddr string) bool {
 func (i *IoToolModel) createDir(dirName string) bool {
 	err := os.Mkdir(dirName, 0755)
 	return err == nil
+}
+
+// Get CurrentDirectory
+func GetCurrentDirectory() string {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		checkerr.CheckErr(err)
+	}
+	return strings.Replace(dir+"/", "\\", "/", -1)
 }
 
 // ScanDir /* Get the full path of all files in the current folder.
