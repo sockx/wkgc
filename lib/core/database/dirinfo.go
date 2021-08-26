@@ -1,15 +1,18 @@
 package database
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type DirInfo struct {
 	gorm.Model
-	Dirname  string
-	Path     string
-	Describe string
-	Isgit    bool
-	Lang     string
-	Tags     []Tag `gorm:"many2many:dirinfo_tag"`
+	ID       uint   `gorm:"primaryKey" json:"id"`
+	Dirname  string `json:"dirname"`
+	Path     string `json:"path"`
+	Describe string `json:"describe"`
+	Isgit    bool   `json:"isgit"`
+	Lang     string `json:"lang"`
+	Tags     []Tag  `gorm:"many2many:dirinfo_tag" json:"tags"`
 }
 
 func (d *DirInfo) Init(dirname string, dirpath string, describe string, isgit bool, lang string) {
@@ -21,11 +24,28 @@ func (d *DirInfo) Init(dirname string, dirpath string, describe string, isgit bo
 }
 
 func (d *DirInfo) AddTag(tag *Tag) {
-	d.Tags = append(d.Tags, *tag)
+	var flag = false
+	for i := 0; i < len(d.Tags); i++ {
+		if d.Tags[i].Name == (*tag).Name {
+			flag = true
+		}
+	}
+	if !flag {
+		d.Tags = append(d.Tags, *tag)
+	}
 }
 func (d *DirInfo) AddTags(tag *[]Tag) {
+	flag := false
 	for i := 0; i < len(*tag); i++ {
-		d.Tags = append(d.Tags, (*tag)[i])
+		flag = false
+		for j := 0; j < len(d.Tags); j++ {
+			if d.Tags[j].Name == (*tag)[i].Name {
+				flag = true
+			}
+		}
+		if !flag {
+			d.Tags = append(d.Tags, (*tag)[i])
+		}
 	}
 }
 func (d *DirInfo) SetTags(tag *[]Tag) {
@@ -35,14 +55,21 @@ func (d *DirInfo) SetTags(tag *[]Tag) {
 /*
 	Single insert
 */
-func (d *DirInfo) Add() {
-	DB.Create(d)
+func (d *DirInfo) Create() {
+	var td DirInfo
+	if td.SelectDirInfoByPath(d.Path) {
+		td.AddTags(&d.Tags)
+		*d = td
+		d.Save()
+	} else {
+		DB.Create(d)
+	}
 }
 
 /*
 	Single update
 */
-func (d *DirInfo) Update() {
+func (d *DirInfo) Save() {
 	DB.Save(d)
 }
 
@@ -50,7 +77,7 @@ func (d *DirInfo) Update() {
 	Single delete
 */
 func (d *DirInfo) DeleteDirInfo() bool {
-	if err := DB.Delete(d, d.ID); err != nil {
+	if err := DB.Delete(d, d.ID).Error; err != nil {
 		return false
 	}
 	return true
